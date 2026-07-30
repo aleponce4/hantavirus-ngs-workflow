@@ -1,61 +1,54 @@
-# Hantavirus NGS Analysis Workflow
+# Hantavirus NGS Analysis Workflow (Legacy Prototype)
 
-Workflow for processing Hantavirus Illumina sequencing data including quality control, mapping, variant calling, consensus generation, and basic visualization. Developed to standardize analysis of segmented viral genomes (L, M, and S segments) in research studies.
+> [!CAUTION]
+> **Archived Legacy Prototype**: This repository represents an early, unmaintained first-generation Bash pipeline prototype. It has been superseded by the production containerized Nextflow DSL2 pipeline **[viral-intrahost-variant-workflow](https://github.com/aleponce4/viral-intrahost-variant-workflow)**.
+> This repository is preserved as an archived read-only record for historical project tracking and must not be used for production data processing.
+
+---
 
 ## Overview
 
-This workflow performs:
+Workflow for processing Hantavirus Illumina sequencing data including quality control, mapping, variant calling, consensus generation, and basic visualization. Developed to standardize analysis of segmented viral genomes (L, M, and S segments) in early research studies.
 
-1. Read preprocessing and trimming
-2. Reference-based alignment
-3. Variant calling
-4. Consensus sequence generation
-5. Coverage analysis
-6. Primer evaluation
-
-The implementation focuses on reproducible processing of viral sequencing datasets rather than development of new algorithms.
-
-## Workflow Structure
+### Workflow Structure
 
 Major components:
 
-• Read QC and adapter trimming  
-• Primer trimming  
-• Reference alignment  
-• Variant calling  
-• Consensus generation  
-• Coverage analysis  
-• Primer evaluation  
+- Read QC and adapter trimming  
+- Primer trimming  
+- Reference alignment  
+- Variant calling  
+- Consensus generation  
+- Coverage analysis  
+- Primer evaluation  
 
-## Installation
+---
+
+## Installation & Historical Setup
 
 ### Requirements
 
-• Conda or Miniconda  
-• Git (optional)  
+- Conda or Miniconda  
+- Git  
 
 ### Setup
 
 Clone repository:
 
 ```bash
-git clone https://github.com/aleponce4/hantavirus-pipeline
-cd hantavirus_pipeline
-````
+git clone https://github.com/aleponce4/hantavirus-ngs-workflow.git
+cd hantavirus-ngs-workflow
+```
 
-Run setup:
+Run setup script:
 
 ```bash
 ./setup.sh
 ```
 
-The setup script:
+---
 
-• Creates the conda environment
-• Installs required dependencies
-• Creates directory structure
-
-## Input Data
+## Input Data Conventions
 
 Expected directory structure:
 
@@ -63,13 +56,13 @@ Expected directory structure:
 
 Place paired-end reads in:
 
-```
+```text
 data/raw_reads/
 ```
 
 Naming convention:
 
-```
+```text
 SAMPLE_R1.fastq.gz
 SAMPLE_R2.fastq.gz
 ```
@@ -78,164 +71,25 @@ SAMPLE_R2.fastq.gz
 
 Organize references by genome segment:
 
-```
+```text
 data/references/
-
-L_segment/
-M_segment/
-S_segment/
+  L_segment/
+  M_segment/
+  S_segment/
 ```
 
-Each segment should contain:
+Each segment directory expects a FASTA reference sequence and matching GFF3 annotation file.
 
-• FASTA reference sequence
-• GFF3 annotation file
+---
 
-### Primer file (optional)
+## ⚠️ Legacy Limitations & Operational Warnings
 
-```
-data/primers/Primers.csv
-```
+- **Superseded Architecture:** This pipeline is unmaintained and lacks the containerization, automated unit testing, schema validation, and reproducible provenance of `viral-intrahost-variant-workflow`.
+- **Parameter Consumption Note:** The prototype wrapper scripts (`run_pipeline.sh`) process raw inputs present in `data/raw_reads/` directly; individual sample CLI arguments passed to `run_pipeline.sh` are not parsed.
+- **Directory Cleanup Safeguard:** Legacy execution scripts contain hardcoded workspace cleanup routines under `results/`. Reviewers and users are advised to consult `viral-intrahost-variant-workflow` for maintained viral genomics pipelines.
 
-Required columns:
+---
 
-• Primer name
-• Region
-• Sequence
+## License
 
-Example:
-
-```
-Name,Region,Sequence
-SF1,1-32F,TAGTAGTAGACTCCTTGAGAAGCTACT
-```
-
-## Running the Workflow
-
-Activate environment:
-
-```bash
-conda activate De_Novo_pipeline
-```
-
-Run pipeline:
-
-```bash
-bash run_pipeline.sh
-```
-
-Run multiple samples sequentially:
-
-```bash
-for sample in sample1 sample2 sample3
-do
-    bash run_pipeline.sh
-done
-```
-
-## HPC Usage
-
-The workflow supports execution on multi-core systems and HPC environments.
-
-Features:
-
-• Automatic CPU detection
-• Sample-level parallel processing
-• Resource-aware thread allocation
-• Job tracking
-
-Example SLURM submission:
-
-```bash
-#SBATCH --job-name=hantavirus
-#SBATCH --nodes=1
-#SBATCH --ntasks=1
-#SBATCH --cpus-per-task=48
-#SBATCH --mem=180G
-#SBATCH --time=24:00:00
-
-module load conda
-conda activate De_Novo_pipeline
-
-cd /path/to/hantavirus_pipeline
-
-bash run_pipeline.sh
-```
-
-## Processing Strategy
-
-The workflow uses a two-pass alignment strategy.
-
-### First pass
-
-• Mapping to reference
-• Variant calling
-• Initial consensus generation
-
-### Sample classification
-
-Samples with low average coverage are classified as negative and excluded from second-pass refinement.
-
-### Second pass (positive samples)
-
-• Alignment to metaconsensus
-• Read extraction
-• Re-alignment to original reference
-• Final variant calling
-• Consensus comparison
-
-This improves mapping while maintaining consistent genomic coordinates.
-
-## Output Structure
-
-Results are written to:
-
-```
-results/
-
-first_pass/
-second_pass/
-negative_samples/
-trimmed/
-plots/
-primer_evaluation/
-```
-
-Description:
-
-• **first_pass/** – Initial processing results
-• **second_pass/** – Refined processing results
-• **negative_samples/** – Low coverage samples
-• **trimmed/** – Processed reads
-• **plots/** – Coverage visualizations
-• **primer_evaluation/** – Primer analysis results
-
-## Visualization Outputs
-
-Generated outputs include:
-
-• Coverage plots
-• Reference vs consensus alignment comparisons
-• Primer location maps
-
-## Primer Evaluation
-
-Primer evaluation module analyzes:
-
-• Primer sequence properties
-• Binding efficiency to consensus sequences
-• Potential problematic primers
-
-Outputs include summary reports and suggested improvements.
-
-## Troubleshooting
-
-Common checks:
-
-• Verify FASTQ naming conventions
-• Confirm conda environment is active
-• Check logs directory for errors
-• Ensure FASTA and GFF files match
-• Verify input directory structure
-
-
+This legacy archive is provided under the [MIT License](LICENSE).
